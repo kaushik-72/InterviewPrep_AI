@@ -2,7 +2,7 @@
 
 An AI-powered interview preparation app that generates role-specific questions and explains concepts using Google Gemini.
 
-🔗 Live Demo: https://interview-prep-ai-puce.vercel.app/
+🔗 Live Demo: https://interview-prep-ai-git-main-kaushik72s-projects.vercel.app/
 
 
 ## Features
