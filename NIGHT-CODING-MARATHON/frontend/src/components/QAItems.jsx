@@ -15,7 +15,7 @@ const QAItem = ({ item, onPin }) => {
         </h3>
 
         <button onClick={() => onPin?.(item._id)}>
-          {item.pinned ? "📌" : "📍"}
+          {item.isPinned ? "📌" : "📍"}
         </button>
       </div>
 

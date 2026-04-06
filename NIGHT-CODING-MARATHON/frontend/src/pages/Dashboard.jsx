@@ -8,33 +8,43 @@ const Dashboard = () => {
   const [sessions, setSessions] = useState([]);
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
 
   const fetchSessions = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(API_PATHS.SESSION.GET_ALL);
-      setSessions(res.data.sessions);
+      setSessions(res.data.sessions || []);
     } catch (err) {
       console.log(err.response);
+      alert("Failed to load sessions");
+    } finally {
+      setLoading(false);
     }
   };
 
   const createSession = async () => {
     if (!role || !experience) return alert("Fill all fields");
 
+    setCreating(true);
     try {
-      await axios.post(API_PATHS.SESSION.CREATE, {
+      const res = await axios.post(API_PATHS.SESSION.CREATE, {
         role,
         experience,
         questions: [],
       });
+
+      setRole("");
+      setExperience("");
+      navigate(`/interview/${res.data.session._id}`); // ✅ go straight to new session
     } catch (error) {
       console.log(error.response);
+      alert("Failed to create session");
+    } finally {
+      setCreating(false);
     }
-
-    setRole("");
-    setExperience("");
-    fetchSessions();
   };
 
   useEffect(() => {
@@ -42,10 +52,10 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto pt-10">
+      <div className="max-w-6xl mx-auto pt-10 px-4">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -60,33 +70,45 @@ const Dashboard = () => {
 
           <div className="flex flex-col md:flex-row gap-4">
             <input
-              placeholder="Enter Role (Frontend Developer)"
+              placeholder="Enter Role (e.g. Frontend Developer)"
               value={role}
               className="border border-gray-200 p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-orange-400"
               onChange={(e) => setRole(e.target.value)}
             />
 
             <input
-              placeholder="Experience (2 yrs)"
+              placeholder="Experience (e.g. 2 years)"
               value={experience}
-              className="border border-gray-200 p-3 rounded-lg w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="border border-gray-200 p-3 rounded-lg w-full md:w-48 focus:outline-none focus:ring-2 focus:ring-orange-400"
               onChange={(e) => setExperience(e.target.value)}
             />
 
             <button
               onClick={createSession}
-              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition cursor-pointer"
+              disabled={creating}
+              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
             >
-              + Create
+              {creating ? "Creating..." : "+ Create"}
             </button>
           </div>
         </div>
 
-        {/* Sessions */}
-        {sessions.length === 0 ? (
+        {/* Sessions List */}
+        {loading ? (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white p-5 rounded-2xl shadow-sm border animate-pulse h-32"
+              />
+            ))}
+          </div>
+        ) : sessions.length === 0 ? (
           <div className="text-center text-gray-500 mt-20">
             <p className="text-lg">No sessions yet 😕</p>
-            <p className="text-sm">Create your first session to get started</p>
+            <p className="text-sm mt-1">
+              Create your first session to get started
+            </p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -99,6 +121,9 @@ const Dashboard = () => {
                 <h2 className="font-semibold text-lg mb-2">{s.role}</h2>
                 <p className="text-gray-500 text-sm">
                   {s.experience} experience
+                </p>
+                <p className="text-gray-400 text-xs mt-1">
+                  {s.questions?.length || 0} questions
                 </p>
                 <div className="mt-4 text-xs text-gray-400">
                   Click to start →

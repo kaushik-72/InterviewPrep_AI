@@ -1,5 +1,4 @@
-const BASE_URL =
-  `${import.meta.env.VITE_API_BASE_URL}/api` || "http://localhost:9000/api";
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"}/api`;
 
 export const API_PATHS = {
   AUTH: {
@@ -12,6 +11,7 @@ export const API_PATHS = {
     GET_ONE: `${BASE_URL}/sessions`, // usage: GET_ONE/:id
   },
   AI: {
+    GENERATE: `${BASE_URL}/ai/generate-questions`,
     GENERATE_QUESTIONS: `${BASE_URL}/ai/generate-questions`,
     EXPLAIN: `${BASE_URL}/ai/generate-explanation`,
   },
