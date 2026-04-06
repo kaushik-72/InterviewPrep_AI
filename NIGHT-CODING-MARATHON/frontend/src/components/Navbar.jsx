@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
+    toast.success("Logged out successfully 👋", { position: "top-right" });
     navigate("/");
   };
 
@@ -20,14 +22,13 @@ const Navbar = () => {
       <div className="flex gap-4">
         <button
           onClick={() => navigate("/dashboard")}
-          className="text-gray-600"
+          className="text-gray-600 hover:text-black transition"
         >
           Dashboard
         </button>
-
         <button
           onClick={logout}
-          className="bg-black text-white px-4 py-1 rounded"
+          className="bg-black text-white px-4 py-1 rounded hover:bg-gray-800 transition"
         >
           Logout
         </button>

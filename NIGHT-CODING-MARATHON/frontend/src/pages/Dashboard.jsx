@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { API_PATHS } from "../utils/apiPaths";
 import axios from "../utils/axiosInstance";
 import Navbar from "../components/Navbar";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [sessions, setSessions] = useState([]);
@@ -18,15 +19,19 @@ const Dashboard = () => {
       const res = await axios.get(API_PATHS.SESSION.GET_ALL);
       setSessions(res.data.sessions || []);
     } catch (err) {
-      console.log(err.response);
-      alert("Failed to load sessions");
+      toast.error("Failed to load sessions 😕", { position: "top-right" });
     } finally {
       setLoading(false);
     }
   };
 
   const createSession = async () => {
-    if (!role || !experience) return alert("Fill all fields");
+    if (!role || !experience) {
+      toast.error("Please fill in role and experience 📝", {
+        position: "top-center",
+      });
+      return;
+    }
 
     setCreating(true);
     try {
@@ -35,13 +40,12 @@ const Dashboard = () => {
         experience,
         questions: [],
       });
-
+      toast.success("Session created! 🚀", { position: "top-right" });
       setRole("");
       setExperience("");
-      navigate(`/interview/${res.data.session._id}`); // ✅ go straight to new session
+      navigate(`/interview/${res.data.session._id}`);
     } catch (error) {
-      console.log(error.response);
-      alert("Failed to create session");
+      toast.error("Failed to create session 😕", { position: "top-right" });
     } finally {
       setCreating(false);
     }
@@ -56,7 +60,6 @@ const Dashboard = () => {
       <Navbar />
 
       <div className="max-w-6xl mx-auto pt-10 px-4">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-gray-500 mt-1">
@@ -64,10 +67,8 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Create Session Card */}
         <div className="bg-white p-6 rounded-2xl shadow-sm mb-8">
           <h2 className="text-lg font-semibold mb-4">Create New Session</h2>
-
           <div className="flex flex-col md:flex-row gap-4">
             <input
               placeholder="Enter Role (e.g. Frontend Developer)"
@@ -75,25 +76,22 @@ const Dashboard = () => {
               className="border border-gray-200 p-3 rounded-lg flex-1 focus:outline-none focus:ring-2 focus:ring-orange-400"
               onChange={(e) => setRole(e.target.value)}
             />
-
             <input
               placeholder="Experience (e.g. 2 years)"
               value={experience}
               className="border border-gray-200 p-3 rounded-lg w-full md:w-48 focus:outline-none focus:ring-2 focus:ring-orange-400"
               onChange={(e) => setExperience(e.target.value)}
             />
-
             <button
               onClick={createSession}
               disabled={creating}
-              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {creating ? "Creating..." : "+ Create"}
             </button>
           </div>
         </div>
 
-        {/* Sessions List */}
         {loading ? (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
@@ -106,9 +104,7 @@ const Dashboard = () => {
         ) : sessions.length === 0 ? (
           <div className="text-center text-gray-500 mt-20">
             <p className="text-lg">No sessions yet 😕</p>
-            <p className="text-sm mt-1">
-              Create your first session to get started
-            </p>
+            <p className="text-sm mt-1">Create your first session to get started</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -119,15 +115,11 @@ const Dashboard = () => {
                 className="bg-white p-5 rounded-2xl shadow-sm border hover:shadow-md hover:scale-[1.02] transition cursor-pointer"
               >
                 <h2 className="font-semibold text-lg mb-2">{s.role}</h2>
-                <p className="text-gray-500 text-sm">
-                  {s.experience} experience
-                </p>
+                <p className="text-gray-500 text-sm">{s.experience} experience</p>
                 <p className="text-gray-400 text-xs mt-1">
                   {s.questions?.length || 0} questions
                 </p>
-                <div className="mt-4 text-xs text-gray-400">
-                  Click to start →
-                </div>
+                <div className="mt-4 text-xs text-gray-400">Click to start →</div>
               </div>
             ))}
           </div>
