@@ -19,8 +19,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ai-interview-prep-kwfpbg3d0-sarveshs-projects-eba40f12.vercel.app",
-  "https://ai-interview-prep-app-git-main-sarveshs-projects-eba40f12.vercel.app",
+  "https://interview-prep-ai-puce.vercel.app/",
 ];
 
 app.use(
